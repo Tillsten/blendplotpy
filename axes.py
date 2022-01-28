@@ -4,11 +4,10 @@ from attr import define, field
 import numpy as np
 
 from line import Line
-from blendpy import Box, Matrix2D, Point, Context, Rgba32, font
+from blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
 from color import colors
 
-def get_ticks(minmax, size):
-    return np.linspace(minmax[0], minmax[1], int(3*size)).tolist()
+
 
 @define
 class Axis:
@@ -50,8 +49,8 @@ class Axis:
         self.data2inch.invert()
 
     def generate_ticks(self):
-        self.xticks = get_ticks((self.view_lim.x0, self.view_lim.x1), self.w)
-        self.yticks = get_ticks((self.view_lim.y0, self.view_lim.y1), self.h)
+        self.xticks = get_ticks(self.view_lim.x0, self.view_lim.x1, self.w)
+        self.yticks = get_ticks(self.view_lim.y0, self.view_lim.y1, self.h)
 
     @property
     def x1(self):

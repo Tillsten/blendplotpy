@@ -102,8 +102,10 @@ class Canvas(QWidget):
             self.bl_paint()
 
     def bl_paint(self):
+        ci = g.BLContextCreateInfo()
+        ci.threadCount = 4
         ctx = Context()
-        ctx.begin(self.blImage)
+        ctx.begin(self.blImage, ci)
         ctx.setFillStyle(Rgba32(0xFFAAAAAA))
         ctx.fillAll()
         ctx.setCompOp(g.BL_COMP_OP_SRC_COPY)
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     from color import colors
     app = QApplication([])
     c = Canvas()
-    x = np.linspace(-10, 10, 5000)
+    x = np.linspace(-10, 10, 2000)
     y = np.sin(x)
 
     c.show()
@@ -127,7 +129,7 @@ if __name__ == "__main__":
     N = 4
     r = np.random.randint(0, len(colors), size=N)
     for i in range(N):
-        l = c.axis.add_line(x, y, list(colors)[i], 2)
+        l = c.axis.add_line(x, y, list(colors)[i], 4)
     c.frames = 0
     c.last_t = c.dt()
 

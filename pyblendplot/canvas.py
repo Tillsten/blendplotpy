@@ -5,11 +5,11 @@ from qtpy.QtCore import QTimer, Qt, QThread
 from qtpy.QtWidgets import QWidget, QApplication
 from qtpy.QtGui import QImage, QPainter, QMouseEvent
 import attr
-from sympy import Q
 
 
-from axes import Axis
+from pyblendplot.axes import Axis
 from blendpy import Matrix2D, Image, g, Point, Context, Rgba32
+
 
 @attr.define
 class Canvas(QWidget):
@@ -114,6 +114,7 @@ class Canvas(QWidget):
         self.axis.draw(ctx)
         ctx.end()
 
+
 if __name__ == "__main__":
     import numpy as np
     from color import colors
@@ -133,7 +134,6 @@ if __name__ == "__main__":
     c.frames = 0
     c.last_t = c.dt()
 
-
     def update_xy(l=l, i=i):
         c.frames += 1
         if c.frames % 60 == 0:
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
         for i in range(N):
             c.axis.artists[i].y = (np.sin(x+(i+1)*c.dt())*np.sin(x/3+5*c.dt())
-                + i/5.11 + np.random.normal(scale=0.05, size=x.size))
+                                   + i/5.11 + np.random.normal(scale=0.05, size=x.size))
 
         c.repaint()
 
@@ -151,4 +151,3 @@ if __name__ == "__main__":
     t.start()
 
 app.exec()
-

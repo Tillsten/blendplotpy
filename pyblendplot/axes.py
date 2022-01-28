@@ -1,12 +1,12 @@
 from math import pi
 from typing import List
 from attr import define, field
-import numpy as np
+from math import pi, log10, ceil
 
-from line import Line
+
+from pyblendplot.line import Line
 from blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
 from color import colors
-
 
 
 @define
@@ -81,7 +81,7 @@ class Axis:
         ctx.strokeRect(self.x0, self.y0, self.w, self.h)
         ctx.setFillStyle(self.front_color)
 
-
+        places = max(0, ceil(-log10(abs(self.xticks[1]-self.xticks[0]))))
         for i in self.xticks:
             p = self.inch2data.mapPoint(i, 0)
             p.y = self.y0
@@ -89,11 +89,13 @@ class Axis:
             ctx.translate(p)
             ctx.scale(-1, 1)
             ctx.rotate(-pi)
-            txt = "%.0f" % i
+            txt = ("%%0.%df" % places) % i
             ctx.fillUtf8Text(Point(-0.00-len(txt)*0.03, .1), font, txt)
             ctx.rotate(pi)
             ctx.scale(-1, 1)
             ctx.translate(-p)
+
+        places = max(0, ceil(-log10(abs(self.yticks[1]-self.yticks[0]))))
         for i in self.yticks:
             p = self.inch2data.mapPoint(0, i)
             p.x = self.x0
@@ -101,7 +103,7 @@ class Axis:
             ctx.translate(p)
             ctx.scale(-1, 1)
             ctx.rotate(pi)
-            txt = "%.0f" % i
+            txt = ("%%0.%df" % places) % i
             ctx.fillUtf8Text(Point(-0.02-len(txt)*0.06, .04), font, txt)
             ctx.rotate(pi)
             ctx.scale(-1, 1)
@@ -117,5 +119,3 @@ class Axis:
         for a in self.artists:
             a.draw(ctx)
         ctx.restore()
-
-

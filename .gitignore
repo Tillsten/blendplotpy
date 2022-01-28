@@ -2,3 +2,6 @@
 /cpp_functions.cpp
 /include
 /__pycache__
+/_skbuild
+/dist
+/*.egg-info

@@ -96,7 +96,7 @@ class Canvas(QWidget):
             self.bl_paint()
         if self.zooming:
             dx = pos - self.start_zooming
-            dxd = self.axis.data2inch.mapVector(dx)
+            dxd = -self.axis.data2inch.mapVector(dx)
             self.axis.set_viewlim(self.axis.view_lim * (1+0.2*dxd))
             self.start_zooming = pos
             self.bl_paint()
@@ -106,7 +106,7 @@ class Canvas(QWidget):
         ci.threadCount = 4
         ctx = Context()
         ctx.begin(self.blImage, ci)
-        ctx.setFillStyle(Rgba32(0xFFAAAAAA))
+        ctx.setFillStyle(Rgba32(0xFF000000))
         ctx.fillAll()
         ctx.setCompOp(g.BL_COMP_OP_SRC_COPY)
         ctx.setStrokeTransformOrder(g.BL_STROKE_TRANSFORM_ORDER_BEFORE)

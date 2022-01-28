@@ -22,6 +22,9 @@ class Axis:
     inch2data: Matrix2D = field(init=False)
     data2inch: Matrix2D = field(init=False)
 
+    front_color: Rgba32 = Rgba32(colors['yellow'])
+    bg_color: Rgba32 = Rgba32(colors['black'])
+
     def __attrs_post_init__(self):
         self.generate_transforms()
 
@@ -71,10 +74,13 @@ class Axis:
 
     def draw_self(self, ctx: Context):
         ctx.save()
-        ctx.setFillStyle(Rgba32(0xFFFFFFFF))
+        ctx.setFillStyle(self.bg_color)
+
         ctx.fillRect(self.x0, self.y0, self.w, self.h)
+        ctx.setStrokeStyle(self.front_color)
         ctx.strokeRect(self.x0, self.y0, self.w, self.h)
-        ctx.setFillStyle(Rgba32(0xFF000000))
+        ctx.setFillStyle(self.front_color)
+
 
         for i in self.xticks:
             p = self.inch2data.mapPoint(i, 0)
@@ -111,4 +117,5 @@ class Axis:
         for a in self.artists:
             a.draw(ctx)
         ctx.restore()
+
 

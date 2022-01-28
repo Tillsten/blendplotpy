@@ -16,7 +16,7 @@ class Line:
 
     def draw(self, ctx):
         ctx.save()
-        ctx.setStrokeStyle(g.BLRgba32(self.color + 0xFF000000))
+        ctx.setStrokeStyle(g.BLRgba32(self.color))
         ctx.setStrokeWidth(self.linewidth)
         self.path.reset()
         make_path(self.x.astype('f'), self.y.astype('f'),  self.path)

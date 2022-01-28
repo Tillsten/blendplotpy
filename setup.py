@@ -9,6 +9,6 @@ setup(
     description="Fast plotting based on Blend2d",
     author='Till Stensitzki',
     license="MIT",
-    packages=['pyblendplot', 'blend2d', 'asmjit'],
+    packages=['pyblendplot'],
     tests_require=['pytest'],
 )

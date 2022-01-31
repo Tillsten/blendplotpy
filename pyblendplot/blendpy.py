@@ -1,12 +1,14 @@
 from pathlib import Path
 import cppyy
-import time
 import cppyy.gbl as g
+from sysconfig import get_path
 
+cppyy.add_include_path(get_path('include'))
 cppyy.add_include_path(str(Path(__file__).parent / 'include'))
 cppyy.include('blend2d.h')
-cppyy.load_library('blend2d.dll')
+cppyy.load_library(str(Path(__file__).parent / 'bin/blend2d.dll'))
 
+print(__file__)
 cppyy.cppdef("""
 #include <vector>
 void make_path(const std::vector<float>& x, const std::vector<float>& y, BLPath& p)

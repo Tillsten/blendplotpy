@@ -6,9 +6,9 @@ from qtpy.QtWidgets import QWidget, QApplication
 from qtpy.QtGui import QImage, QPainter, QMouseEvent
 import attr
 
+from .blendpy import Matrix2D, Image, g, Point, Context, Rgba32
+from .axes import Axis
 
-from pyblendplot.axes import Axis
-from blendpy import Matrix2D, Image, g, Point, Context, Rgba32
 
 
 @attr.define
@@ -91,13 +91,13 @@ class Canvas(QWidget):
         if self.dragging:
             dx = pos - self.start
             dxd = self.axis.data2inch.mapVector(dx)
-            self.axis.set_viewlim(self.axis.view_lim - dxd)
+            self.axis.set_viewlim(self.axis.view_lim - dxd )
             self.start = pos
             self.bl_paint()
         if self.zooming:
             dx = pos - self.start_zooming
             dxd = -self.axis.data2inch.mapVector(dx)
-            self.axis.set_viewlim(self.axis.view_lim * (1+0.2*dxd))
+            self.axis.set_viewlim(self.axis.view_lim * (1+0.2*dxd)+ Point(1e-14, 1e-14))
             self.start_zooming = pos
             self.bl_paint()
 
@@ -114,40 +114,3 @@ class Canvas(QWidget):
         self.axis.draw(ctx)
         ctx.end()
 
-
-if __name__ == "__main__":
-    import numpy as np
-    from color import colors
-    app = QApplication([])
-    c = Canvas()
-    x = np.linspace(-10, 10, 2000)
-    y = np.sin(x)
-
-    c.show()
-    t = QTimer()
-
-    fn = []
-    N = 4
-    r = np.random.randint(0, len(colors), size=N)
-    for i in range(N):
-        l = c.axis.add_line(x, y, list(colors)[i], 4)
-    c.frames = 0
-    c.last_t = c.dt()
-
-    def update_xy(l=l, i=i):
-        c.frames += 1
-        if c.frames % 60 == 0:
-            t = time.time()
-            c.setWindowTitle(f"{60 / (t-c.last_t)} fps")
-            c.last_t = t
-
-        for i in range(N):
-            c.axis.artists[i].y = (np.sin(x+(i+1)*c.dt())*np.sin(x/3+5*c.dt())
-                                   + i/5.11 + np.random.normal(scale=0.05, size=x.size))
-
-        c.repaint()
-
-    t.timeout.connect(update_xy)
-    t.start()
-
-app.exec()

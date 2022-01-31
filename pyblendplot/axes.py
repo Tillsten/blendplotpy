@@ -3,10 +3,9 @@ from typing import List
 from attr import define, field
 from math import pi, log10, ceil
 
-
-from pyblendplot.line import Line
-from blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
-from color import colors
+from .line import Line
+from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
+from .color import colors
 
 
 @define
@@ -81,33 +80,35 @@ class Axis:
         ctx.strokeRect(self.x0, self.y0, self.w, self.h)
         ctx.setFillStyle(self.front_color)
 
-        places = max(0, ceil(-log10(abs(self.xticks[1]-self.xticks[0]))))
-        for i in self.xticks:
-            p = self.inch2data.mapPoint(i, 0)
-            p.y = self.y0
-            ctx.strokeLine(p.x, self.y0, p.x, self.y0+0.05)
-            ctx.translate(p)
-            ctx.scale(-1, 1)
-            ctx.rotate(-pi)
-            txt = ("%%0.%df" % places) % i
-            ctx.fillUtf8Text(Point(-0.00-len(txt)*0.03, .1), font, txt)
-            ctx.rotate(pi)
-            ctx.scale(-1, 1)
-            ctx.translate(-p)
+        if len(self.xticks) > 0:
+            places = max(0, ceil(-log10(abs(self.xticks[1]-self.xticks[0]))))
+            for i in self.xticks:
+                p = self.inch2data.mapPoint(i, 0)
+                p.y = self.y0
+                ctx.strokeLine(p.x, self.y0, p.x, self.y0+0.05)
+                ctx.translate(p)
+                ctx.scale(-1, 1)
+                ctx.rotate(-pi)
+                txt = ("%%0.%df" % places) % i
+                ctx.fillUtf8Text(Point(-0.00-len(txt)*0.03, .1), font, txt)
+                ctx.rotate(pi)
+                ctx.scale(-1, 1)
+                ctx.translate(-p)
 
-        places = max(0, ceil(-log10(abs(self.yticks[1]-self.yticks[0]))))
-        for i in self.yticks:
-            p = self.inch2data.mapPoint(0, i)
-            p.x = self.x0
-            ctx.strokeLine(self.x0, p.y, self.x0+0.05, p.y)
-            ctx.translate(p)
-            ctx.scale(-1, 1)
-            ctx.rotate(pi)
-            txt = ("%%0.%df" % places) % i
-            ctx.fillUtf8Text(Point(-0.02-len(txt)*0.06, .04), font, txt)
-            ctx.rotate(pi)
-            ctx.scale(-1, 1)
-            ctx.translate(-p)
+        if len(self.yticks) > 0:
+            places = max(0, ceil(-log10(abs(self.yticks[1]-self.yticks[0]))))
+            for i in self.yticks:
+                p = self.inch2data.mapPoint(0, i)
+                p.x = self.x0
+                ctx.strokeLine(self.x0, p.y, self.x0+0.05, p.y)
+                ctx.translate(p)
+                ctx.scale(-1, 1)
+                ctx.rotate(pi)
+                txt = ("%%0.%df" % places) % i
+                ctx.fillUtf8Text(Point(-0.02-len(txt)*0.06, .04), font, txt)
+                ctx.rotate(pi)
+                ctx.scale(-1, 1)
+                ctx.translate(-p)
         ctx.transform(self.inch2data)
         ctx.restore()
 

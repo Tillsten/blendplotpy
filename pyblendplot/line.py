@@ -1,6 +1,6 @@
 import attr
 import numpy as np
-from blendpy import make_path, g
+from .blendpy import make_path, g
 
 
 @attr.s(auto_attribs=True, slots=True)

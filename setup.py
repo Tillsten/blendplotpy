@@ -1,5 +1,4 @@
 import sys
-
 from skbuild import setup
 
 
@@ -11,4 +10,7 @@ setup(
     license="MIT",
     packages=['pyblendplot'],
     tests_require=['pytest'],
+    cmake_source_dir='pyblendplot',
+    cmake_install_dir='pyblendplot'
 )
+

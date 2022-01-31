@@ -1,5 +1,7 @@
+from pathlib import Path
+
 colors = {}
-with open("color.txt") as f:
+with open(Path(__file__).parent / "color.txt") as f:
     f.readline()
     for l in f.readlines():
         idx = l.find("#")

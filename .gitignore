@@ -5,3 +5,9 @@
 /_skbuild/**
 /dist
 /*.egg-info
+/pyblendplot/include
+/pyblendplot/lib
+/pyblendplot/asmjit
+/pyblendplot/bin
+__pycache__
+.vscode

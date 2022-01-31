@@ -10,7 +10,8 @@ setup(
     license="MIT",
     packages=['pyblendplot'],
     tests_require=['pytest'],
-    cmake_source_dir='pyblendplot',
+    cmake_source_dir='3rdparty',
     cmake_install_dir='pyblendplot'
 )
+
 

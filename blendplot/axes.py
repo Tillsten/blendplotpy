@@ -6,6 +6,7 @@ from math import pi, log10, ceil
 from .line import Line
 from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
 from .color import colors
+from .ticks import get_ticks_talbot
 
 
 @define
@@ -35,6 +36,10 @@ class Axis:
         self.generate_ticks()
 
     def set_viewlim(self, view_lim):
+        view_lim.x0 = max(-1e9, view_lim.x0)
+        view_lim.x1 = min(1e9, view_lim.x1)
+        view_lim.y0 = max(-1e9, view_lim.y0)
+        view_lim.y1 = min(1e9, view_lim.y1)
         self.view_lim = view_lim
         self.generate_transforms()
         self.generate_ticks()
@@ -51,8 +56,12 @@ class Axis:
         self.data2inch.invert()
 
     def generate_ticks(self):
-        self.xticks = get_ticks(self.view_lim.x0, self.view_lim.x1, self.w)
-        self.yticks = get_ticks(self.view_lim.y0, self.view_lim.y1, self.h)
+        self.xticks = get_ticks_talbot(
+            self.view_lim.x0, self.view_lim.x1, self.w)
+        self.yticks = get_ticks_talbot(
+            self.view_lim.y0, self.view_lim.y1, self.h)
+        if len(self.yticks) == 0:
+            print(self.yticks, self.view_lim)
 
     @property
     def x1(self):

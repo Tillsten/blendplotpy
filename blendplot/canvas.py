@@ -10,7 +10,6 @@ from .blendpy import Matrix2D, Image, g, Point, Context, Rgba32
 from .axes import Axis
 
 
-
 @attr.define
 class Canvas(QWidget):
     qtImage: QImage = attr.attrib(factory=QImage)
@@ -44,7 +43,7 @@ class Canvas(QWidget):
         return Point((w / self.dpi), (h / self.dpi))
 
     def make_axis(self):
-        self.axis = Axis(0.14, 0.1, self.size.x - 1, self.size.y - 1)
+        self.axis = Axis(0.14, 0.14, self.size.x - 1, self.size.y - 1)
 
     def resizeEvent(self, ev):
         w, h = self.width(), self.height()
@@ -91,13 +90,14 @@ class Canvas(QWidget):
         if self.dragging:
             dx = pos - self.start
             dxd = self.axis.data2inch.mapVector(dx)
-            self.axis.set_viewlim(self.axis.view_lim - dxd )
+            self.axis.set_viewlim(self.axis.view_lim - dxd)
             self.start = pos
             self.bl_paint()
         if self.zooming:
             dx = pos - self.start_zooming
             dxd = -self.axis.data2inch.mapVector(dx)
-            self.axis.set_viewlim(self.axis.view_lim * (1+0.2*dxd)+ Point(1e-14, 1e-14))
+            self.axis.set_viewlim(self.axis.view_lim *
+                                  (1+0.1*dxd))
             self.start_zooming = pos
             self.bl_paint()
 
@@ -113,4 +113,3 @@ class Canvas(QWidget):
         ctx.transform(self.pixel2inch)
         self.axis.draw(ctx)
         ctx.end()
-

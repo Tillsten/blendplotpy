@@ -3,7 +3,7 @@ from typing import List
 from attr import define, field
 from math import pi, log10, ceil
 
-from .line import Line
+from .artists import Line
 from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
 from .color import colors
 from .ticks import get_ticks_talbot

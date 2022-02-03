@@ -6,27 +6,15 @@ from qtpy.QtWidgets import QWidget, QApplication
 from qtpy.QtGui import QImage, QPainter, QMouseEvent
 import attr
 
-from .blendpy import Matrix2D, Image, g, Point, Context, Rgba32
+from .blendpy import Matrix2D, Image, g, Point, Context, Rgba32, Box
 from .axes import Axis
 
-
-@attr.define
-class Canvas(QWidget):
-    qtImage: QImage = attr.attrib(factory=QImage)
+@attr.define(slots=False)
+class Canvas:
     blImage: Image = attr.attrib(factory=Image)
-    t0: float = attr.Factory(time.time)
-    xlim: list[float] = [-10, 10]
-    ylim: list[float] = [10, -10]
-    dragging: bool = False
-    zooming: bool = False
     dpi: float = 72
-
-    def __attrs_post_init__(self):
-        super().__init__()
-        self.make_axis()
-
-    def dt(self):
-        return time.time() - self.t0
+    thread_count: int = 4
+    axis_list: list[Axis] = attr.Factory(list)
 
     def generate_transforms(self, w, h):
         p = Point(w, h)
@@ -37,13 +25,49 @@ class Canvas(QWidget):
         self.inch2pixel = Matrix2D(self.pixel2inch)
         self.inch2pixel.invert()
 
+    def bl_paint(self):
+        ci = g.BLContextCreateInfo()
+        ci.threadCount = self.thread_count
+        ctx = Context()
+        ctx.begin(self.blImage, ci)
+        ctx.setFillStyle(Rgba32(0xFF000000))
+        ctx.fillAll()
+        ctx.setCompOp(g.BL_COMP_OP_SRC_COPY)
+        ctx.setStrokeTransformOrder(g.BL_STROKE_TRANSFORM_ORDER_BEFORE)
+        ctx.transform(self.pixel2inch)
+        for ax in self.axis_list:
+            ax.draw(ctx)
+        ctx.end()
+
+
+
+@attr.define(slots=False)
+class CanvasQT(QWidget, Canvas):
+    qtImage: QImage = attr.attrib(factory=QImage)    
+    t0: float = attr.Factory(time.time)
+    xlim: list[float] = [-10, 10]
+    ylim: list[float] = [10, -10]
+    dragging: bool = False
+    zooming: bool = False    
+    
+
+    def __attrs_post_init__(self):
+        super().__init__()
+        #self.make_axis()
+
+    def dt(self):
+        return time.time() - self.t0
+
+
     @property
     def size(self):
         w, h = self.width(), self.height()
         return Point((w / self.dpi), (h / self.dpi))
 
     def make_axis(self):
-        self.axis = Axis(0.14, 0.14, self.size.x - 1, self.size.y - 1)
+        ax = Axis(0.14, 0.14, self.size.x - 1, self.size.y - 1)
+        self.axis_list.append(ax)
+        return ax
 
     def resizeEvent(self, ev):
         w, h = self.width(), self.height()
@@ -58,7 +82,7 @@ class Canvas(QWidget):
                                     c_void_p(int(self.qtImage.bits())),
                                     self.qtImage.bytesPerLine())
         self.generate_transforms(w, h)
-        self.axis.set_pos(0.18, 0.18, self.size.x - 0.25, self.size.y - 0.25)
+        self.axis_list[0].set_pos(0.18, 0.18, self.size.x - 0.25, self.size.y - 0.25)
 
     def paintEvent(self, ev):
         painter = QPainter(self)
@@ -87,29 +111,18 @@ class Canvas(QWidget):
 
     def mouseMoveEvent(self, ev: QMouseEvent):
         pos = self.inch2pixel.mapPoint(ev.x(), ev.y())
+        ax = self.axis_list[0]
         if self.dragging:
             dx = pos - self.start
-            dxd = self.axis.data2inch.mapVector(dx)
-            self.axis.set_viewlim(self.axis.view_lim - dxd)
+            dxd = ax.data2inch.mapVector(dx)
+            ax.set_viewlim(ax.view_lim - dxd)
             self.start = pos
             self.bl_paint()
         if self.zooming:
             dx = pos - self.start_zooming
-            dxd = -self.axis.data2inch.mapVector(dx)
-            self.axis.set_viewlim(self.axis.view_lim *
+            dxd = -ax.data2inch.mapVector(dx)
+            ax.set_viewlim(ax.view_lim *
                                   (1+0.1*dxd))
             self.start_zooming = pos
             self.bl_paint()
 
-    def bl_paint(self):
-        ci = g.BLContextCreateInfo()
-        ci.threadCount = 4
-        ctx = Context()
-        ctx.begin(self.blImage, ci)
-        ctx.setFillStyle(Rgba32(0xFF000000))
-        ctx.fillAll()
-        ctx.setCompOp(g.BL_COMP_OP_SRC_COPY)
-        ctx.setStrokeTransformOrder(g.BL_STROKE_TRANSFORM_ORDER_BEFORE)
-        ctx.transform(self.pixel2inch)
-        self.axis.draw(ctx)
-        ctx.end()

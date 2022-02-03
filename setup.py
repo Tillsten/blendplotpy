@@ -2,9 +2,9 @@ import sys
 from skbuild import setup
 
 setup(
-    name="pyblendplot",
+    name="blendplot",
     version="0.0.1",
-    description="Fast plotting based on Blend2d",
+    description="Fast toy-plotting libary based on Blend2d",
     author='Till Stensitzki',
     license="MIT",
     packages=['blendplot'],

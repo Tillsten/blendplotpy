@@ -11,3 +11,4 @@
 /blendplot/bin
 __pycache__
 .vscode
+build

@@ -8,9 +8,14 @@ cur_dir = Path(__file__).parent
 
 cppyy.add_include_path(str(cur_dir / 'include'))
 cppyy.include('blend2d.h')
-cppyy.load_library(str(cur_dir/ 'bin/blend2d'))
+if (cur_dir/ 'bin/blend2d.dll').exists():
+    libpath = str(cur_dir/ 'bin/blend2d.dll')
+elif (cur_dir/ 'lib/libblend2.so').exists():
+    libpath = str((cur_dir/ 'lib/libblend2d.so'))
 
-print(__file__)
+cppyy.load_library(libpath)
+
+
 cppyy.cppdef((cur_dir/"cpp_helpers.cpp").open().read())
 
 

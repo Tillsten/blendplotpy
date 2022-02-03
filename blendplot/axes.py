@@ -23,7 +23,7 @@ class Axis:
     data2inch: Matrix2D = field(init=False)
 
     front_color: Rgba32 = Rgba32(colors['yellow'])
-    bg_color: Rgba32 = Rgba32(colors['black'])
+    bg_color: Rgba32 = Rgba32(0xFF000000)
 
     def __attrs_post_init__(self):
         self.generate_transforms()
@@ -72,7 +72,9 @@ class Axis:
         return self.y0 + self.h
 
     def add_line(self, x, y, color, lw=2):
-        line = Line(x, y, color=colors[color], linewidth=lw)
+        if isinstance(color, str):
+            color=colors[color]
+        line = Line(x, y, color, linewidth=lw)
         self.artists.append(line)
         return line
 
@@ -125,7 +127,6 @@ class Axis:
         ctx.save()
         ctx.clipToRect(self.x0, self.y0, self.w, self.h)
         ctx.transform(self.inch2data)
-
         for a in self.artists:
             a.draw(ctx)
         ctx.restore()

@@ -30,8 +30,6 @@ class Line:
         ctx.restore()
 
 
-
-
 @attr.define
 class Scatter(Artist):
     x: np.ndarray

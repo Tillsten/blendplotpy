@@ -47,7 +47,7 @@ class Canvas:
         ctx.begin(self.blImage, ci)
         ctx.setFillStyle(Rgba32(0xFF000000))
         ctx.fillAll()
-        ctx.setCompOp(g.BL_COMP_OP_SRC_COPY)
+        ctx.setCompOp(g.BL_COMP_OP_SRC_OVER)
         ctx.setStrokeTransformOrder(g.BL_STROKE_TRANSFORM_ORDER_BEFORE)
         ctx.transform(self.pixel2inch)
         for ax in self.axis_list:

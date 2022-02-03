@@ -1,21 +1,36 @@
 import time
 from ctypes import c_void_p
+from tkinter.tix import X_REGION
 
 from qtpy.QtCore import QTimer, Qt, QThread
 from qtpy.QtWidgets import QWidget, QApplication
 from qtpy.QtGui import QImage, QPainter, QMouseEvent
 import attr
 
-from .blendpy import Matrix2D, Image, g, Point, Context, Rgba32, Box
+from .blendpy import Matrix2D, Image, g, Point, Context, Rgba32, Box, Rect
 from .axes import Axis
 
 @attr.define(slots=False)
 class Canvas:
-    blImage: Image = attr.attrib(factory=Image)
     dpi: float = 72
     thread_count: int = 4
+    size_inches: Rect = Point(4, 4)
     axis_list: list[Axis] = attr.Factory(list)
+    blImage: Image = attr.attrib()
 
+    pixel2inch: Matrix2D = attr.ib(init=False)
+    inch2pixel: Matrix2D = attr.ib(init=False)
+
+    def __attrs_post_init__(self):
+        self.generate_transforms(self.blImage.width(), self.blImage.height())
+
+    @blImage.default
+    def _default_image(self):
+        im = Image(int(self.size_inches.x / self.dpi),
+                   int(self.size_inches.y // self.dpi),
+                   g.BL_FORMAT_PRGB32)
+        return im
+        
     def generate_transforms(self, w, h):
         p = Point(w, h)
         p_in = p / self.dpi
@@ -39,6 +54,11 @@ class Canvas:
             ax.draw(ctx)
         ctx.end()
 
+    def make_axis(self):
+        ax = Axis(0.14, 0.14, self.size_inches.x - 1, self.size_inches.y - 1)
+        self.axis_list.append(ax)
+        return ax
+
 
 
 @attr.define(slots=False)
@@ -48,26 +68,14 @@ class CanvasQT(QWidget, Canvas):
     xlim: list[float] = [-10, 10]
     ylim: list[float] = [10, -10]
     dragging: bool = False
-    zooming: bool = False    
+    zooming: bool = False   
     
-
-    def __attrs_post_init__(self):
+    def __attrs_pre_init__(self):
         super().__init__()
-        #self.make_axis()
+        self.dpi = self.logicalDpiX()
 
     def dt(self):
         return time.time() - self.t0
-
-
-    @property
-    def size(self):
-        w, h = self.width(), self.height()
-        return Point((w / self.dpi), (h / self.dpi))
-
-    def make_axis(self):
-        ax = Axis(0.14, 0.14, self.size.x - 1, self.size.y - 1)
-        self.axis_list.append(ax)
-        return ax
 
     def resizeEvent(self, ev):
         w, h = self.width(), self.height()
@@ -81,8 +89,9 @@ class CanvasQT(QWidget, Canvas):
         self.blImage.createFromData(w, h, g.BL_FORMAT_PRGB32,
                                     c_void_p(int(self.qtImage.bits())),
                                     self.qtImage.bytesPerLine())
-        self.generate_transforms(w, h)
-        self.axis_list[0].set_pos(0.18, 0.18, self.size.x - 0.25, self.size.y - 0.25)
+        self.size_inches = Point(w/self.dpi, h/self.dpi)
+        self.generate_transforms(w, h)        
+        self.axis_list[0].set_pos(0.18, 0.18, self.size_inches.x - 0.25, self.size_inches.y - 0.25)
 
     def paintEvent(self, ev):
         painter = QPainter(self)

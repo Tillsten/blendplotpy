@@ -17,7 +17,7 @@ void make_scatter_path(const std::vector<float> &x, const std::vector<float> &y,
 {
     int n = x.size();
     p.reserve(n + 10);
-    ctx.str
+    
     for (int i = 0; i < n; i++)
     {
         p.addPath(symbol, BLPoint(x[i], y[i]));

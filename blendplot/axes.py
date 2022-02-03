@@ -60,8 +60,7 @@ class Axis:
             self.view_lim.x0, self.view_lim.x1, self.w)
         self.yticks = get_ticks_talbot(
             self.view_lim.y0, self.view_lim.y1, self.h)
-        if len(self.yticks) == 0:
-            print(self.yticks, self.view_lim)
+
 
     @property
     def x1(self):

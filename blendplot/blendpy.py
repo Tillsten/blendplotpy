@@ -8,7 +8,7 @@ cur_dir = Path(__file__).parent
 
 cppyy.add_include_path(str(cur_dir / 'include'))
 cppyy.include('blend2d.h')
-cppyy.load_library(str(cur_dir/ 'bin/blend2d.dll'))
+cppyy.load_library(str(cur_dir/ 'bin/blend2d'))
 
 print(__file__)
 cppyy.cppdef((cur_dir/"cpp_helpers.cpp").open().read())

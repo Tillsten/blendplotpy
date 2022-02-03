@@ -20,7 +20,6 @@ N = 20
 r = np.random.randint(0, len(colors), size=N)
 for i in range(N):
     lc = list(colors)[r[i]]
-    print(c)
     lc = Rgba32(colors[lc])
     lc.setA(128)
     l = ax.add_line(x, y, lc, 8)

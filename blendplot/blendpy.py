@@ -7,8 +7,10 @@ cur_dir = Path(__file__).parent
 
 
 cppyy.add_include_path(str(cur_dir / 'include'))
-cppyy.add_library_path(str(cur_dir/'lib'))
-cppyy.add_library_path(str(cur_dir/'bin'))
+if (cur_dir/'lib').exists():
+    cppyy.add_library_path(str(cur_dir/'lib')) # linux
+if (cur_dir/'bin').exists():
+    cppyy.add_library_path(str(cur_dir/'bin')) # windows
 cppyy.include('blend2d.h')
 
 cppyy.load_library('blend2d')
@@ -19,6 +21,8 @@ cppyy.cppdef((cur_dir/"cpp_helpers.cpp").open().read())
 
 get_ticks = g.calculate_ticks
 make_path = g.make_path
+
+# Pythonize some of the more often used classes with nicer __str__
 
 def m_print(m):
     s = ''
@@ -40,8 +44,8 @@ g.BLRect.__str__ = lambda p: 'Box(x0=%.2f, y0=%.2f, w=%.2f, h=%.2f)' % (
     p.x0, p.y0, p.w, p.h)
 Rect = g.BLRect
 
-g.BLContext.strokePath.__release_gil__ = True
-g.BLContext.end.__release_gil__ = True
+#g.BLContext.strokePath.__release_gil__ = True
+#g.BLContext.end.__release_gil__ = True
 Context = g.BLContext
 
 Image = g.BLImage

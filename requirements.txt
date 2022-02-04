@@ -2,3 +2,4 @@ cppyy
 qtpy
 numpy
 numba
+pyqt5

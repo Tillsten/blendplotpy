@@ -3,7 +3,7 @@ from typing import List
 from attr import define, field
 from math import pi, log10, ceil
 
-from .artists import Line
+from .artists import Artist, Line
 from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
 from .color import colors
 from .ticks import get_ticks_talbot
@@ -15,7 +15,7 @@ class Axis:
     y0: float
     w: float
     h: float
-    artists: List[Line] = field(factory=list)
+    artists: List[Artist] = field(factory=list)
     view_lim: Box = Box(-5, -5, 10, 10)
     xticks: List[float] = field(factory=list)
     yticks: List[float] = field(factory=list)
@@ -69,6 +69,9 @@ class Axis:
     @property
     def y1(self):
         return self.y0 + self.h
+
+    def add_artist(self, artist: Artist):
+        self.artists.append(artist)
 
     def add_line(self, x, y, color, lw=2):
         if isinstance(color, str):

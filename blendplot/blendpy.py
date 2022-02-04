@@ -21,6 +21,7 @@ cppyy.cppdef((cur_dir/"cpp_helpers.cpp").open().read())
 
 get_ticks = g.calculate_ticks
 make_path = g.make_path
+draw_scatter = g.draw_scatter
 
 # Pythonize some of the more often used classes with nicer __str__
 
@@ -28,8 +29,8 @@ def m_print(m):
     s = ''
     for i in range(3):
         for j in range(2):
-            s += '%.2f ' % getattr(m, 'm%d%d' % (i, j))
-    return s
+            s += 'm%d%d=%.2f, ' % (i, j, getattr(m, 'm%d%d' % (i, j)))
+    return f'Matrix2D({s})'
 g.BLMatrix2D.__str__ = m_print
 Matrix2D = g.BLMatrix2D
 

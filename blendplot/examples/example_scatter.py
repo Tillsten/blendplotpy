@@ -10,8 +10,8 @@ import time
 app = QApplication([])
 c = CanvasQT()
 ax = c.make_axis()
-x = np.linspace(-10, 10, 400)
-y = np.sin(x)
+x = np.linspace(-10, 10, 300)
+y = x[::1]
 
 c.show()
 t = QTimer()
@@ -21,7 +21,7 @@ N = 3
 r = np.random.randint(0, len(colors), size=N)
 for i in range(N):
     lc = list(colors)[r[i]]
-    l = Scatter(x, y, colors['black'], colors[lc], size=0.1)
+    l = Scatter(x, y, colors[lc], colors['white'], size=15)
     ax.add_artist(l)
     
 c.frames = 0
@@ -36,7 +36,9 @@ def update_xy(l=l, i=i):
         c.last_t = t
     for i in range(N):
         y = (np.sin(x+(i/3+1)*c.dt())*np.sin(x/3+1*c.dt())
-             + i/4.11 + np.random.normal(scale=0.05, size=x.size))
+             + i/4.11 + np.random.normal(scale=0.15, size=x.size))        
+        
+        
         ax.artists[i].set_data(x, y)
 
     c.repaint()

@@ -1,6 +1,6 @@
 import attr
 import numpy as np
-from .blendpy import make_path, g, Context
+from .blendpy import make_path, g, Context, draw_scatter
 
 from typing import ClassVar, Dict, Protocol
 
@@ -76,13 +76,7 @@ class Scatter(Artist):
         ctx.setStrokeWidth(self.linewidth)
         ctx.setFillStyle(g.BLRgba32(self.facecolor))
         p = self.symbols_list[self.symbol]        
-        for xi, yi in zip(self.x, self.y):
-            ctx.save()
-            ctx.translate(xi, yi)
-            ctx.scale(self.size)
-            ctx.fillPath(p)
-            ctx.strokePath(p)
-            ctx.restore()
+        draw_scatter(ctx, p, self.x.astype('f8'), self.y.astype('f8'), self.size)
         ctx.restore()
 
     def set_data(self, x, y):

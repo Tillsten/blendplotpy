@@ -13,15 +13,24 @@ void make_path(const std::vector<float> &x, const std::vector<float> &y, BLPath 
     };
 }
 
-void make_scatter_path(const std::vector<float> &x, const std::vector<float> &y, BLPath &p, const BLPath &symbol)
+void draw_scatter(BLContext &ctx, const BLPath &p, const std::vector<double> &x, const std::vector<double> &y, float size)
 {
-    int n = x.size();
-    p.reserve(n + 10);
-    
-    for (int i = 0; i < n; i++)
+    auto transform = BLMatrix2D();
+    BLMatrix2D::invert(transform, ctx.userMatrix());
+
+    auto tp = BLPath(p);
+    tp.transform(BLMatrix2D::makeScaling(size));
+    auto scale = transform.mapVector(BLPoint(1, 1));
+    tp.transform(BLMatrix2D::makeScaling(scale));
+
+    for (size_t i = 0; i < x.size(); i++)
     {
-        p.addPath(symbol, BLPoint(x[i], y[i]));
-    };
+        auto coords = transform.mapPoint(BLPoint(x[i], y[i]));
+        ctx.translate(x[i], y[i]);
+        ctx.fillPath(tp);
+        ctx.strokePath(tp);
+        ctx.translate(-x[i], -y[i]);
+    }
 }
 
 std::vector<double> calculate_ticks(const double left, const double right, const double size, std::optional<int> num_ticks = std::nullopt)
@@ -74,4 +83,3 @@ std::vector<double> calculate_ticks(const double left, const double right, const
     }
     return out;
 }
-

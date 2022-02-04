@@ -6,7 +6,7 @@ Currently uses `cppyy` to interface with blend2d, but this could be replaced wit
 Tested mainly under windows.
 
 The figure below shows a scene with 5 line plot each containing 1280 points and a linewidth of 8 in
-addition to 5 scatter plot with 128 points each. FPS is still well above 200 ftps.
+addition to 5 scatter plot with 128 points each. FPS is still around 200 fps.
 
 ![grafik](https://user-images.githubusercontent.com/189880/152532410-4da4eccc-eff2-4735-a9be-33f66bd8d7e0.png)
 

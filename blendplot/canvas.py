@@ -16,6 +16,7 @@ class Canvas:
     thread_count: int = 4
     size_inches: Rect = Point(4, 4)
     axis_list: list[Axis] = attr.Factory(list)
+    do_autolimit: list[bool] = attr.Factory(list)
     blImage: Image = attr.attrib()
 
     pixel2inch: Matrix2D = attr.ib(init=False)
@@ -50,13 +51,17 @@ class Canvas:
         ctx.setCompOp(g.BL_COMP_OP_SRC_OVER)
         ctx.setStrokeTransformOrder(g.BL_STROKE_TRANSFORM_ORDER_BEFORE)
         ctx.transform(self.pixel2inch)
-        for ax in self.axis_list:
+        for al, ax in zip(self.do_autolimit, self.axis_list):
+            if al:
+                ax.autolimit()
             ax.draw(ctx)
+            
         ctx.end()
 
     def make_axis(self):
         ax = Axis(0.14, 0.14, self.size_inches.x - 1, self.size_inches.y - 1)
         self.axis_list.append(ax)
+        self.do_autolimit.append(True)
         return ax
 
 
@@ -100,6 +105,7 @@ class CanvasQT(QWidget, Canvas):
         painter.drawImage(0, 0, self.qtImage)
 
     def mousePressEvent(self, ev: QMouseEvent):
+        self.do_autolimit[0] = False
         if ev.button() == Qt.MidButton:
             self.dragging = True
             self.start = self.inch2pixel.mapPoint(ev.x(), ev.y())

@@ -22,6 +22,7 @@ cppyy.cppdef((cur_dir/"cpp_helpers.cpp").open().read())
 get_ticks = g.calculate_ticks
 make_path = g.make_path
 draw_scatter = g.draw_scatter
+box_union = g.box_union
 
 # Pythonize some of the more often used classes with nicer __str__
 

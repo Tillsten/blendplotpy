@@ -2,6 +2,23 @@
 #include <optional>
 #include "blend2d.h"
 
+template <typename T>
+BLBox box_union(const T &a, const T &b)
+{
+    return BLBox(blMin(a.x0, b.x0), blMin(a.y0, b.y0),
+                 blMax(a.x1, b.x1), blMax(a.y1, b.y1));
+}
+
+BLBox box_union(const std::vector<BLBox> &a)
+{
+    auto out = BLBox();
+    for (auto &&i : a)
+    {
+        out = box_union(out, i);
+    }
+    return out;
+}
+
 void make_path(const std::vector<float> &x, const std::vector<float> &y, BLPath &p)
 {
     int n = x.size();

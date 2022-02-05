@@ -1,10 +1,11 @@
+
 from math import pi
 from typing import List
 from attr import define, field
 from math import pi, log10, ceil
 
 from .artists import Artist, Line
-from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks
+from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks, box_union
 from .color import colors
 from .ticks import get_ticks_talbot
 
@@ -16,11 +17,15 @@ class Axis:
     w: float
     h: float
     artists: List[Artist] = field(factory=list)
+    
     view_lim: Box = Box(-5, -5, 10, 10)
     xticks: List[float] = field(factory=list)
     yticks: List[float] = field(factory=list)
+    
     inch2data: Matrix2D = field(init=False)
     data2inch: Matrix2D = field(init=False)
+    #pixel2data: Matrix2D = field(init=False)
+    #data2pixel: Matrix2D = field(init=False)
 
     front_color: Rgba32 = Rgba32(colors['yellow'])
     bg_color: Rgba32 = Rgba32(0xFF000000)
@@ -60,7 +65,6 @@ class Axis:
             self.view_lim.x0, self.view_lim.x1, self.w)
         self.yticks = get_ticks_talbot(
             self.view_lim.y0, self.view_lim.y1, self.h)
-
 
     @property
     def x1(self):
@@ -128,7 +132,12 @@ class Axis:
     def draw_artists(self, ctx):
         ctx.save()
         ctx.clipToRect(self.x0, self.y0, self.w, self.h)
-        ctx.transform(self.inch2data)
+        ctx.transform(self.inch2data)        
         for a in self.artists:
-            a.draw(ctx)
+            a.draw(ctx, self)
         ctx.restore()
+
+    def autolimit(self):
+        bboxes = [a.get_limits(None, self) for a in self.artists]
+        self.set_viewlim(box_union(bboxes)*1.1)
+            

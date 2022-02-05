@@ -21,7 +21,7 @@ N = 3
 r = np.random.randint(0, len(colors), size=N)
 for i in range(N):
     lc = list(colors)[r[i]]
-    l = Scatter(x, y, colors[lc], colors['white'], size=15)
+    l = Scatter(x, y, colors[lc], colors['white'], size=5)
     ax.add_artist(l)
     
 c.frames = 0
@@ -36,11 +36,8 @@ def update_xy(l=l, i=i):
         c.last_t = t
     for i in range(N):
         y = (np.sin(x+(i/3+1)*c.dt())*np.sin(x/3+1*c.dt())
-             + i/4.11 + np.random.normal(scale=0.15, size=x.size))        
-        
-        
+             + i/4.11 + 0.1*np.random.normal(scale=0.15, size=x.size))        
         ax.artists[i].set_data(x, y)
-
     c.repaint()
 
 

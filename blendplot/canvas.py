@@ -59,7 +59,7 @@ class Canvas:
         ctx.end()
 
     def make_axis(self):
-        ax = Axis(0.14, 0.14, self.size_inches.x - 1, self.size_inches.y - 1)
+        ax = Axis(0.15, 0.15, self.size_inches.x - 1, self.size_inches.y - 1)
         self.axis_list.append(ax)
         self.do_autolimit.append(True)
         return ax
@@ -96,7 +96,7 @@ class CanvasQT(QWidget, Canvas):
                                     self.qtImage.bytesPerLine())
         self.size_inches = Point(w/self.dpi, h/self.dpi)
         self.generate_transforms(w, h)        
-        self.axis_list[0].set_pos(0.18, 0.18, self.size_inches.x - 0.25, self.size_inches.y - 0.25)
+        self.axis_list[0].set_pos(0.25, 0.18, self.size_inches.x - 0.3, self.size_inches.y - 0.25)
 
     def paintEvent(self, ev):
         painter = QPainter(self)
@@ -112,7 +112,7 @@ class CanvasQT(QWidget, Canvas):
             self.setMouseTracking(True)
         elif ev.button() == Qt.RightButton:
             self.zooming = True
-            self.start_zooming = self.inch2pixel.mapPoint(ev.x(), ev.y())
+            self.start_zooming = Point(ev.x(), ev.y())
             self.setMouseTracking(True)
 
     def mouseReleaseEvent(self, ev: QMouseEvent):
@@ -125,19 +125,20 @@ class CanvasQT(QWidget, Canvas):
             self.setMouseTracking(False)
 
     def mouseMoveEvent(self, ev: QMouseEvent):
-        pos = self.inch2pixel.mapPoint(ev.x(), ev.y())
+        
         ax = self.axis_list[0]
         if self.dragging:
+            pos = self.inch2pixel.mapPoint(ev.x(), ev.y())
             dx = pos - self.start
             dxd = ax.data2inch.mapVector(dx)
             ax.set_viewlim(ax.view_lim - dxd)
             self.start = pos
             self.bl_paint()
         if self.zooming:
-            dx = pos - self.start_zooming
-            dxd = -ax.data2inch.mapVector(dx)
-            ax.set_viewlim(ax.view_lim *
-                                  (1+0.1*dxd))
-            self.start_zooming = pos
+            pos_px = Point(ev.x(), ev.y())
+            dx = pos_px - self.start_zooming            
+            dxd = Point((1+0.02)**dx.x, (1+0.02)**dx.y)            
+            ax.set_viewlim(ax.view_lim * dxd)
+            self.start_zooming = pos_px
             self.bl_paint()
 

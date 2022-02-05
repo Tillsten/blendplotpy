@@ -9,6 +9,7 @@ from .blendpy import Box, Matrix2D, Point, Context, Rgba32, font, get_ticks, box
 from .color import colors
 from .ticks import get_ticks_talbot
 
+AUTORANGE_PADDING = 1.1
 
 @define
 class Axis:
@@ -91,7 +92,6 @@ class Axis:
     def draw_self(self, ctx: Context):
         ctx.save()
         ctx.setFillStyle(self.bg_color)
-
         ctx.fillRect(self.x0, self.y0, self.w, self.h)
         ctx.setStrokeStyle(self.front_color)
         ctx.strokeRect(self.x0, self.y0, self.w, self.h)
@@ -103,30 +103,28 @@ class Axis:
                 p = self.inch2data.mapPoint(i, 0)
                 p.y = self.y0
                 ctx.strokeLine(p.x, self.y0, p.x, self.y0+0.05)
+                ctx.save()
                 ctx.translate(p)
                 ctx.scale(-1, 1)
                 ctx.rotate(-pi)
                 txt = ("%%0.%df" % places) % i
                 ctx.fillUtf8Text(Point(-0.00-len(txt)*0.03, .1), font, txt)
-                ctx.rotate(pi)
-                ctx.scale(-1, 1)
-                ctx.translate(-p)
-
+                ctx.restore()
+                
         if len(self.yticks) > 0:
             places = max(0, ceil(-log10(abs(self.yticks[1]-self.yticks[0]))))
             for i in self.yticks:
                 p = self.inch2data.mapPoint(0, i)
                 p.x = self.x0
                 ctx.strokeLine(self.x0, p.y, self.x0+0.05, p.y)
+                ctx.save()
                 ctx.translate(p)
                 ctx.scale(-1, 1)
                 ctx.rotate(pi)
                 txt = ("%%0.%df" % places) % i
                 ctx.fillUtf8Text(Point(-0.02-len(txt)*0.06, .04), font, txt)
-                ctx.rotate(pi)
-                ctx.scale(-1, 1)
-                ctx.translate(-p)
-        ctx.transform(self.inch2data)
+                ctx.restore()
+        
         ctx.restore()
 
     def draw_artists(self, ctx):
@@ -139,5 +137,5 @@ class Axis:
 
     def autolimit(self):
         bboxes = [a.get_limits(None, self) for a in self.artists]
-        self.set_viewlim(box_union(bboxes)*1.1)
+        self.set_viewlim(box_union(bboxes) * AUTORANGE_PADDING)
             

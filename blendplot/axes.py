@@ -137,5 +137,13 @@ class Axis:
 
     def autolimit(self):
         bboxes = [a.get_limits(None, self) for a in self.artists]
-        self.set_viewlim(box_union(bboxes) * AUTORANGE_PADDING)
-            
+        self.set_viewlim(box_union(bboxes) * AUTORANGE_PADDING)            
+    
+    def scaleBy(self, center: Point, scale: Point):        
+        bl = Point(self.view_lim.x0, self.view_lim.y0)
+        tr = Point(self.view_lim.x1, self.view_lim.y1)
+        print(f"{center=} {tr=} {bl=} {scale=}")
+        tr = center + (tr-center) * scale
+        bl = center + (bl-center) * scale
+        print(f"{center=} {tr=} {bl=} {scale=}")
+        #self.set_viewlim(Box(bl.x, bl.y, tr.x, tr.y))

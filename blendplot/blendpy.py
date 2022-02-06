@@ -37,6 +37,7 @@ Matrix2D = g.BLMatrix2D
 
 g.BLPoint.__str__ = lambda p: 'Point(x=%.2f, y=%.2f)' % (p.x, p.y)
 Point = g.BLPoint
+Point.__repr__ = Point.__str__
 
 g.BLBox.__str__ = lambda p: 'Box(x0=%.2f, y0=%.2f, x1=%.2f, y1=%.2f)' % (
     p.x0, p.y0, p.x1, p.y1)

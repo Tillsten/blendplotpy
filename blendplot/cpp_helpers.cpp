@@ -2,6 +2,7 @@
 #include <optional>
 #include "blend2d.h"
 
+
 template <typename T>
 BLBox box_union(const T &a, const T &b)
 {
@@ -50,6 +51,39 @@ void draw_scatter(BLContext &ctx, const BLPath &p, const std::vector<double> &x,
     }
 }
 
+
+
+enum HTextAlignment
+{
+    Left,
+    HCenter,
+    Right
+};
+enum VTextAlignment
+{
+    Top,
+    VCenter,
+    Bottom
+};
+
+struct TextProps
+{
+    HTextAlignment ha = Left;
+    VTextAlignment va = Bottom;
+    BLPoint pos;
+};
+
+void draw_txt(BLContext &ctx, BLPoint &pos, BLFont &font, char *text,
+              HTextAlignment ha = HTextAlignment::HCenter)
+{
+    BLTextMetrics tm;
+    BLGlyphBuffer gb;
+
+    gb.setUtf8Text(text);
+    font.shape(gb);
+    font.getTextMetrics(gb, tm);
+}
+
 std::vector<double> calculate_ticks(const double left, const double right, const double size, std::optional<int> num_ticks = std::nullopt)
 {
     using namespace std;
@@ -68,7 +102,7 @@ std::vector<double> calculate_ticks(const double left, const double right, const
     double magnitude = pow(10, floor(exponent) - 1);
     double right_scaled = floor(max / magnitude);
     double left_scaled = ceil(min / magnitude);
-    const std::array<double, 5> steps = {1, 2, 2.5, 5, 10};
+    const std::array<double, 5> steps =  {1.0, 2.0, 2.5, 5.0, 10.0};
     int step_ticks;
     double step_taken = NAN;
     for (const double &s : steps)

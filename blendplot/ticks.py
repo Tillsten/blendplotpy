@@ -53,14 +53,14 @@ def _simplicity_max(q, Q, j):
 
 
 @njit
-def get_ticks_talbot(dmin, dmax, n_inches, density=1.):
+def get_ticks_talbot(dmin, dmax, n_inches, density=1):
     # density * size gives target number of intervals,
     # density * size + 1 gives target number of tick marks,
     # the density function converts this back to a density in data units
     # (not inches)
 
-    n_inches = max(n_inches, 2.0)  # Set minimum otherwise code can crash :(
-
+    n_inches = max(3*n_inches, 2.0)  # Set minimum otherwise code can crash :(
+    
     if dmin == dmax:
         return np.array([dmin, dmax])
 
@@ -136,3 +136,7 @@ def get_ticks_talbot(dmin, dmax, n_inches, density=1.):
     if best is None:
         raise RuntimeError('could not converge on ticks')
     return np.arange(k) * lstep + lmin
+
+
+
+

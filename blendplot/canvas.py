@@ -105,6 +105,7 @@ class CanvasQT(QWidget, Canvas):
         painter.drawImage(0, 0, self.qtImage)
 
     def mousePressEvent(self, ev: QMouseEvent):
+        self.last_pos = Point(ev.x(), ev.y())
         self.do_autolimit[0] = False
         if ev.button() == Qt.MidButton:
             self.dragging = True
@@ -125,7 +126,7 @@ class CanvasQT(QWidget, Canvas):
             self.setMouseTracking(False)
 
     def mouseMoveEvent(self, ev: QMouseEvent):
-        
+        redraw = False
         ax = self.axis_list[0]
         if self.dragging:
             pos = self.inch2pixel.mapPoint(ev.x(), ev.y())
@@ -133,12 +134,15 @@ class CanvasQT(QWidget, Canvas):
             dxd = ax.data2inch.mapVector(dx)
             ax.set_viewlim(ax.view_lim - dxd)
             self.start = pos
-            self.bl_paint()
+            redraw = True
         if self.zooming:
             pos_px = Point(ev.x(), ev.y())
-            dx = pos_px - self.start_zooming            
-            dxd = Point((1+0.02)**dx.x, (1+0.02)**dx.y)            
-            ax.set_viewlim(ax.view_lim * dxd)
-            self.start_zooming = pos_px
+            dx = pos_px - self.last_pos        
+            scale = Point((1+0.02)**dx.x, (1+0.02)**dx.y)            
+            pos_data = ax.data2inch.mapPoint(self.inch2pixel.mapPoint(self.start_zooming))
+            ax.scaleBy(pos_data, scale)  
+            redraw = True                      
+        if redraw:
             self.bl_paint()
-
+        
+        self.last_pos = Point(ev.x(), ev.y())

@@ -142,8 +142,6 @@ class Axis:
     def scaleBy(self, center: Point, scale: Point):        
         bl = Point(self.view_lim.x0, self.view_lim.y0)
         tr = Point(self.view_lim.x1, self.view_lim.y1)
-        print(f"{center=} {tr=} {bl=} {scale=}")
-        tr = center + (tr-center) * scale
-        bl = center + (bl-center) * scale
-        print(f"{center=} {tr=} {bl=} {scale=}")
-        #self.set_viewlim(Box(bl.x, bl.y, tr.x, tr.y))
+        trn = center + (tr-center) * scale
+        bln = center + (bl-center) * scale      
+        self.set_viewlim(Box(bln.x, bln.y, trn.x, trn.y))

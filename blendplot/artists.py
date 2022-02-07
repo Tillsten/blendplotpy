@@ -1,8 +1,9 @@
 from __future__ import annotations
+from pathlib import Path
 
 import attr
 import numpy as np
-from .blendpy import Box, Matrix2D, make_path, g, Context, draw_scatter
+from .blendpy import Box, Matrix2D, make_path, g, Context, draw_scatter, Point, BLPath
 
 from typing import ClassVar, Dict, Optional, Protocol, TYPE_CHECKING
 
@@ -10,11 +11,20 @@ if TYPE_CHECKING:
     from .axes import Axis
 
 class Artist(Protocol):
+    hit_path: Optional[BLPath] = None
+
     def draw(self, ctx: Context, parent: Axis):
         pass
 
     def get_limits(self, ctx: Context, parent: Axis) -> Optional[Box]:
         pass
+
+    def is_hit(self, p: Point) -> bool:
+        if self.hit_path:
+            return self.hit_path.hitTest(p, g.BL_FILL_RULE_EVEN_ODD)
+        else:
+            return False
+
 
 @attr.define
 class Line(Artist):
@@ -34,13 +44,21 @@ class Line(Artist):
         ctx.setStrokeStyle(g.BLRgba32(self.color))
         ctx.setStrokeWidth(self.linewidth)
         ctx.strokePath(self.path)
+        strokeOpts = g.BLStrokeOptions()
+        strokeOpts.width = self.linewidth
+        approx = g.blDefaultApproximationOptions
+        self.hit_path = BLPath()
+        ol = 'const BLPath& path, const BLStrokeOptionsCore& strokeOptions, const BLApproximationOptions& approximationOptions'
+        f = self.hit_path.addStrokedPath.__overload__(ol)        
+        f(self.path, strokeOpts, approx)
         ctx.restore()
 
     def get_limits(self, ctx: Context, parent: Axis) -> Optional[Box]:
         b = Box()
-        self.path.getBoundingBox(b)
-        print(b)
+        self.path.getBoundingBox(b)        
         return b
+
+
 
 def _make_symbol_paths():
     Path = g.BLPath

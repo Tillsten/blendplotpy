@@ -78,6 +78,7 @@ class CanvasQT(QWidget, Canvas):
     def __attrs_pre_init__(self):
         super().__init__()
         self.dpi = self.logicalDpiX()
+        self.setMouseTracking(True)
 
     def dt(self):
         return time.time() - self.t0
@@ -110,24 +111,27 @@ class CanvasQT(QWidget, Canvas):
         if ev.button() == Qt.MidButton:
             self.dragging = True
             self.start = self.inch2pixel.mapPoint(ev.x(), ev.y())
-            self.setMouseTracking(True)
+            
         elif ev.button() == Qt.RightButton:
             self.zooming = True
             self.start_zooming = Point(ev.x(), ev.y())
-            self.setMouseTracking(True)
+            #self.setMouseTracking(True)
 
     def mouseReleaseEvent(self, ev: QMouseEvent):
         if (ev.button() == Qt.MidButton):
             ev.accept()
             self.dragging = False
-            self.setMouseTracking(False)
+            #self.setMouseTracking(False)
         elif ev.button() == Qt.RightButton:
             self.zooming = False
-            self.setMouseTracking(False)
+            #self.setMouseTracking(False)
 
     def mouseMoveEvent(self, ev: QMouseEvent):
         redraw = False
         ax = self.axis_list[0]
+        pos = self.inch2pixel.mapPoint(ev.x(), ev.y())
+        if ax.is_hit(pos):
+            pass
         if self.dragging:
             pos = self.inch2pixel.mapPoint(ev.x(), ev.y())
             dx = pos - self.start

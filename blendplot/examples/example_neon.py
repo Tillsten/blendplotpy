@@ -20,9 +20,9 @@ N = 10
 
 for i in range(N):
 
-    lc = Rgba32(colors["pink"])
+    lc = Rgba32(colors["bright pink"])
     lc.setA(10)
-    l = ax.add_line(x, y, lc, 10+4*i)
+    l = ax.add_line(x, y, lc, 5+1*(i**2))
 c.frames = 0
 c.last_t = c.dt()
 ax.set_viewlim(Box(-10, -2, 10, 7))

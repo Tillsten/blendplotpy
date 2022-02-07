@@ -1,6 +1,6 @@
 
 from math import pi
-from typing import List
+from typing import List, Optional
 from attr import define, field
 from math import pi, log10, ceil
 
@@ -17,6 +17,7 @@ class Axis:
     y0: float
     w: float
     h: float
+    box: Box = field(init=False)
     artists: List[Artist] = field(factory=list)
     
     view_lim: Box = Box(-5, -5, 10, 10)
@@ -38,6 +39,7 @@ class Axis:
         self.x0 = x0
         self.y0 = y0
         self.w, self.h = w, h
+        
         self.generate_transforms()
         self.generate_ticks()
 
@@ -51,6 +53,7 @@ class Axis:
         self.generate_ticks()
 
     def generate_transforms(self):
+        self.box = Box(self.x0, self.y0, self.x0+self.w, self.y0+self.h)
         xs = self.view_lim.x1 - self.view_lim.x0
         ys = self.view_lim.y1 - self.view_lim.y0
 
@@ -145,3 +148,12 @@ class Axis:
         trn = center + (tr-center) * scale
         bln = center + (bl-center) * scale      
         self.set_viewlim(Box(bln.x, bln.y, trn.x, trn.y))
+
+    def is_hit(self, pos_in) -> Optional[Artist]:
+        if self.box.contains(pos_in):
+            data_coords = self.data2inch.mapPoint(pos_in)
+            for a in self.artists:
+                if a.is_hit(data_coords):
+                    return a
+        else:
+            return None
